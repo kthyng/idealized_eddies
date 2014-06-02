@@ -66,18 +66,10 @@ from tracpy.tracpy_class import Tracpy
 
 units = 'seconds since 0001-01-01'
 
-def init(name):
+def init(name, ndays):
     '''
     Initialization for seeding drifters at all shelf model grid points to be run
     forward.
-
-    Optional inputs for making tests easy to run:
-        date    Input date for name in datetime format
-                e.g., datetime(2009, 11, 20, 0). If date not input,
-                name will be 'temp' 
-        loc     Location of model output
-        grid    If input, will not redo this step. 
-                Default is to load in grid.
     '''
 
     # # Need to make a fake grid

@@ -200,10 +200,6 @@ def init():
     # X, Y = np.meshgrid(np.arange(xcrnrs[0], xcrnrs[1], dx), np.arange(ycrnrs[0], ycrnrs[1], dx))
     # lon0, lat0 = grid['basemap'](X, Y, inverse=True)
 
-    # Start uniform array of drifters across domain using x,y coords
-    x0 = grid['xr'][1:-1,1:-1]
-    y0 = grid['yr'][1:-1,1:-1]
-
     # surface drifters
     z0 = 's'  
     zpar = grid['km']-1
@@ -222,6 +218,10 @@ def init():
     tp = Tracpy(currents_filename, grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps,
                 N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, time_units=time_units,
                 dtFromTracmass=dtFromTracmass, usespherical=False)
+
+    # Start uniform array of drifters across domain using x,y coords
+    x0 = tp.grid['xr'][1:-1,1:-1]
+    y0 = tp.grid['yr'][1:-1,1:-1]
 
     return tp, x0, y0
 

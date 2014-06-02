@@ -210,7 +210,7 @@ def init(name, ndays):
     # Initialize Tracpy class
     tp = Tracpy(currents_filename, grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps,
                 N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, time_units=time_units,
-                dtFromTracmass=dtFromTracmass, usespherical=False)
+                usespherical=False)
 
     # Start uniform array of drifters across domain using x,y coords
     x0 = tp.grid['xr'][1:-1,1:-1]

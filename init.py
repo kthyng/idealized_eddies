@@ -202,7 +202,8 @@ def init():
 
     # surface drifters
     z0 = 's'  
-    zpar = grid['km']-1
+    zpar = 49 # 50 layers?
+    # zpar = grid['km']-1
 
     # for 3d flag, do3d=0 makes the run 2d and do3d=1 makes the run 3d
     do3d = 0

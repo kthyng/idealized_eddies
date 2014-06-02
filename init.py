@@ -64,7 +64,7 @@ from matplotlib import delaunay
 import octant
 from tracpy.tracpy_class import Tracpy
 
-units = 'seconds since 0001-01-01'
+time_units = 'seconds since 0001-01-01'
 
 def init(name, ndays):
     '''

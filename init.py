@@ -212,6 +212,9 @@ def init(name, ndays):
                 N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, time_units=time_units,
                 usespherical=False)
 
+    # force grid reading
+    tp._readgrid()
+
     # Start uniform array of drifters across domain using x,y coords
     x0 = tp.grid['xr'][1:-1,1:-1]
     y0 = tp.grid['yr'][1:-1,1:-1]

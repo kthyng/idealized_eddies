@@ -70,7 +70,7 @@ def run():
 
                 # Read in simulation initialization
                 ndays = (overallstopdate-date).days
-                tp, x0, y0 = init.init()
+                tp, x0, y0 = init.init(name)
                 # nstep, N, ff, tseas, ah, av, lon0, lat0, z0, zpar, do3d, doturb, \
                 #         grid, dostream, doperiodic = init.init()
                 # pdb.set_trace()

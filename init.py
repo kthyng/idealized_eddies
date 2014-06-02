@@ -66,7 +66,7 @@ from tracpy.tracpy_class import Tracpy
 
 units = 'seconds since 0001-01-01'
 
-def init():
+def init(name):
     '''
     Initialization for seeding drifters at all shelf model grid points to be run
     forward.

@@ -25,13 +25,17 @@ def run():
         os.makedirs('figures')
 
     # Loop through all the simulations
-    basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations-unbalanced/'
-    runs = glob(basepath + 'shelfstrat*')
-    # runs = [basepath + 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
+    # basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations-unbalanced/'
+    # runs = glob(basepath + 'shelfstrat*')
+    # # runs = [basepath + 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
+    basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations-balanced/'
+    # runs = glob(basepath + 'shelfstrat*')
+    runs = [basepath + 'shelfstrat_M2_8.94e-08_N2_1.00e-04_f_2.00e-05']
 
     for run in runs:
 
-        runname = 'unbalanced/' + run.split('/')[-1]
+        runname = 'balanced/' + run.split('/')[-1]
+        # runname = 'unbalanced/' + run.split('/')[-1]
 
         # make directory for output
         if not os.path.exists('tracks/' + runname):
@@ -66,16 +70,18 @@ def run():
 
                 # Read in simulation initialization
                 ndays = (overallstopdate-date).days
-                nstep, N, ff, tseas, ah, av, lon0, lat0, z0, zpar, do3d, doturb, \
-                        grid, dostream, doperiodic = init.init()
+                tp, x0, y0 = init.init()
+                # nstep, N, ff, tseas, ah, av, lon0, lat0, z0, zpar, do3d, doturb, \
+                #         grid, dostream, doperiodic = init.init()
                 # pdb.set_trace()
                 # Run tracpy
                 # Save directly to grid coordinates
-                lonp, latp, zp, t, grid \
-                    = tracpy.run.run(['ocean_his_0001.nc',''], 
-                                        nstep, ndays, ff, date, tseas, ah, av, \
-                                        lon0, lat0, z0, zpar, do3d, doturb, runname + '/' + name, N=N,  \
-                                        grid=grid, dostream=dostream, doperiodic=doperiodic, savell=False)
+                # lonp, latp, zp, t, grid \
+                #     = tracpy.run.run(['ocean_his_0001.nc',''], 
+                #                         nstep, ndays, ff, date, tseas, ah, av, \
+                #                         lon0, lat0, z0, zpar, do3d, doturb, runname + '/' + name, N=N,  \
+                #                         grid=grid, dostream=dostream, doperiodic=doperiodic, savell=False)
+                xp, yp, zp, t, T0, U, V = tracpy.run.run(tp, date, x0, y0)
 
             # # If basic figures don't exist, make them
             # if not os.path.exists('figures/' + name + '*.png'):

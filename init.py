@@ -62,6 +62,7 @@ import tracpy
 import time
 from matplotlib import delaunay
 import octant
+from tracpy.tracpy_class import Tracpy
 
 units = 'seconds since 0001-01-01'
 
@@ -79,94 +80,97 @@ def init():
                 Default is to load in grid.
     '''
 
-    # Need to make a fake grid
-    loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
-    grid = tracpy.inout.readgrid(loc)
-    # Replace entries
-    g = netCDF.Dataset('grid.nc')
-    o = netCDF.Dataset('ocean_his_0001.nc')
-    grid['xu'] = np.asfortranarray(g.variables['x_u'][:].T)
-    grid['xv'] = np.asfortranarray(g.variables['x_v'][:].T)
-    grid['yu'] = np.asfortranarray(g.variables['y_u'][:].T)
-    grid['yv'] = np.asfortranarray(g.variables['y_v'][:].T)
-    grid['xr'] = np.asfortranarray(g.variables['x_rho'][:].T)
-    grid['yr'] = np.asfortranarray(g.variables['y_rho'][:].T)
-    grid['xpsi'] = np.asfortranarray(g.variables['x_psi'][:].T)
-    grid['ypsi'] = np.asfortranarray(g.variables['y_psi'][:].T)
+    # # Need to make a fake grid
+    # loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
+    # grid = tracpy.inout.readgrid(loc)
+    # # Replace entries
+    currents_filename = 'ocean_his_0001.nc'
+    grid_filename = 'grid.nc'
+    # grid = tracpy.inout.readgrid(loc)
+    # g = netCDF.Dataset('grid.nc')
+    # o = netCDF.Dataset('ocean_his_0001.nc')
+    # grid['xu'] = np.asfortranarray(g.variables['x_u'][:].T)
+    # grid['xv'] = np.asfortranarray(g.variables['x_v'][:].T)
+    # grid['yu'] = np.asfortranarray(g.variables['y_u'][:].T)
+    # grid['yv'] = np.asfortranarray(g.variables['y_v'][:].T)
+    # grid['xr'] = np.asfortranarray(g.variables['x_rho'][:].T)
+    # grid['yr'] = np.asfortranarray(g.variables['y_rho'][:].T)
+    # grid['xpsi'] = np.asfortranarray(g.variables['x_psi'][:].T)
+    # grid['ypsi'] = np.asfortranarray(g.variables['y_psi'][:].T)
 
-    grid['lonr'], grid['latr'] = grid['basemap'](grid['xr'], grid['yr'], inverse=True)
-    grid['lonu'], grid['latu'] = grid['basemap'](grid['xu'], grid['yu'], inverse=True)
-    grid['lonv'], grid['latv'] = grid['basemap'](grid['xv'], grid['yv'], inverse=True)
-    grid['lonpsi'], grid['latpsi'] = grid['basemap'](grid['xpsi'], grid['ypsi'], inverse=True)
-    grid['lonr'] = np.asfortranarray(grid['lonr'])
-    grid['latr'] = np.asfortranarray(grid['latr'])
-    grid['lonu'] = np.asfortranarray(grid['lonu'])
-    grid['latu'] = np.asfortranarray(grid['latu'])
-    grid['lonv'] = np.asfortranarray(grid['lonv'])
-    grid['latv'] = np.asfortranarray(grid['latv'])
-    grid['lonpsi'] = np.asfortranarray(grid['lonpsi'])
-    grid['latpsi'] = np.asfortranarray(grid['latpsi'])
+    # grid['lonr'], grid['latr'] = grid['basemap'](grid['xr'], grid['yr'], inverse=True)
+    # grid['lonu'], grid['latu'] = grid['basemap'](grid['xu'], grid['yu'], inverse=True)
+    # grid['lonv'], grid['latv'] = grid['basemap'](grid['xv'], grid['yv'], inverse=True)
+    # grid['lonpsi'], grid['latpsi'] = grid['basemap'](grid['xpsi'], grid['ypsi'], inverse=True)
+    # grid['lonr'] = np.asfortranarray(grid['lonr'])
+    # grid['latr'] = np.asfortranarray(grid['latr'])
+    # grid['lonu'] = np.asfortranarray(grid['lonu'])
+    # grid['latu'] = np.asfortranarray(grid['latu'])
+    # grid['lonv'] = np.asfortranarray(grid['lonv'])
+    # grid['latv'] = np.asfortranarray(grid['latv'])
+    # grid['lonpsi'] = np.asfortranarray(grid['lonpsi'])
+    # grid['latpsi'] = np.asfortranarray(grid['latpsi'])
 
-    grid['mask'] = np.asfortranarray(g.variables['mask_rho'][:].T)
-    grid['pm'] = np.asfortranarray(g.variables['pm'][:].T)
-    grid['pn'] = np.asfortranarray(g.variables['pn'][:].T)
+    # grid['mask'] = np.asfortranarray(g.variables['mask_rho'][:].T)
+    # grid['pm'] = np.asfortranarray(g.variables['pm'][:].T)
+    # grid['pn'] = np.asfortranarray(g.variables['pn'][:].T)
 
-    dxv = 1/grid['pm'] #.copy() # pm is 1/\Delta x at cell centers
-    dyu = 1/grid['pn'] #.copy() # pn is 1/\Delta y at cell centers
+    # dxv = 1/grid['pm'] #.copy() # pm is 1/\Delta x at cell centers
+    # dyu = 1/grid['pn'] #.copy() # pn is 1/\Delta y at cell centers
 
-    grid['dxdy'] = dyu*dxv
-    # # Already transposed
-    # grid['dxv'] = 0.5*(dxv[:-1,:]+dxv[1:,:])
-    # grid['dyu'] = 0.5*(dyu[:,:-1]+dyu[:,1:])
-    grid['dxv'] = 0.5*(dxv[:,:-1]+dxv[:,1:])
-    grid['dyu'] = 0.5*(dyu[:-1,:]+dyu[1:,:])
+    # grid['dxdy'] = dyu*dxv
+    # # # Already transposed
+    # # grid['dxv'] = 0.5*(dxv[:-1,:]+dxv[1:,:])
+    # # grid['dyu'] = 0.5*(dyu[:,:-1]+dyu[:,1:])
+    # grid['dxv'] = 0.5*(dxv[:,:-1]+dxv[:,1:])
+    # grid['dyu'] = 0.5*(dyu[:-1,:]+dyu[1:,:])
 
-    grid['imt'] = grid['xr'].shape[0]
-    grid['jmt'] = grid['xr'].shape[1]
+    # grid['imt'] = grid['xr'].shape[0]
+    # grid['jmt'] = grid['xr'].shape[1]
 
-    grid['h'] = np.asfortranarray(g.variables['h'][:].T)
-    grid['sc_r'] = o.variables['s_w'][:] # sigma coords, 31 layers
-    grid['Cs_r'] = o.variables['Cs_w'][:] # stretching curve in sigma coords, 31 layers
-    grid['hc'] = o.variables['hc'][:]
-    grid['theta_s'] = o.variables['theta_s'][:]
-    grid['theta_b'] = o.variables['theta_b'][:]
-    grid['Vtransform'] = o.variables['Vtransform'][0]
-    grid['Vstretching'] = o.variables['Vstretching'][0]
-    grid['km'] = grid['sc_r'].shape[0]-1
+    # grid['h'] = np.asfortranarray(g.variables['h'][:].T)
+    # grid['sc_r'] = o.variables['s_w'][:] # sigma coords, 31 layers
+    # grid['Cs_r'] = o.variables['Cs_w'][:] # stretching curve in sigma coords, 31 layers
+    # grid['hc'] = o.variables['hc'][:]
+    # grid['theta_s'] = o.variables['theta_s'][:]
+    # grid['theta_b'] = o.variables['theta_b'][:]
+    # grid['Vtransform'] = o.variables['Vtransform'][0]
+    # grid['Vstretching'] = o.variables['Vstretching'][0]
+    # grid['km'] = grid['sc_r'].shape[0]-1
 
-    mask2 = grid['mask'].copy()
-    kmt = np.ones((grid['imt'],grid['jmt']),order='f')*grid['km']
-    ind = (mask2==1)
-    ind[0:grid['imt']-1,:] = ind[1:grid['imt'],:]
-    mask2[ind] = 1
-    ind = (mask2==1)
-    ind[:,0:grid['jmt']-1] = ind[:,1:grid['jmt']]
-    mask2[ind] = 1
-    ind = (mask2==0)
-    kmt[ind] = 0
-    grid['kmt'] = kmt
-    grid['Y'], grid['X'] = np.meshgrid(np.arange(grid['jmt']),np.arange(grid['imt'])) # grid in index coordinates, without ghost cells
-    # Triangulation for grid space to curvilinear space
-    grid['tri'] = delaunay.Triangulation(grid['X'].flatten(),grid['Y'].flatten())
-    # Triangulation for curvilinear space to grid space
-    grid['trir'] = delaunay.Triangulation(grid['xr'].flatten(),grid['yr'].flatten())
-    grid['trirllrho'] = delaunay.Triangulation(grid['lonr'].flatten(),grid['latr'].flatten())
-    grid['zwt0'] = octant.depths.get_zw(grid['Vtransform'], grid['Vstretching'], grid['km']+1, 
-                    grid['theta_s'], grid['theta_b'], 
-                    grid['h'].T.copy(order='c'), 
-                    grid['hc'], zeta=0, Hscale=3)
-    grid['zrt0'] = octant.depths.get_zrho(grid['Vtransform'], grid['Vstretching'], grid['km'], 
-                    grid['theta_s'], grid['theta_b'], 
-                    grid['h'].T.copy(order='c'), 
-                    grid['hc'], zeta=0, Hscale=3)
-    # Change dzt to tracmass/fortran ordering
-    grid['zwt0'] = grid['zwt0'].T.copy(order='f')
-    grid['zrt0'] = grid['zrt0'].T.copy(order='f')
-    # this should be the base grid layer thickness that doesn't change in time because it 
-    # is for the reference vertical level
-    grid['dzt0'] = grid['zwt0'][:,:,1:] - grid['zwt0'][:,:,:-1]
+    # mask2 = grid['mask'].copy()
+    # kmt = np.ones((grid['imt'],grid['jmt']),order='f')*grid['km']
+    # ind = (mask2==1)
+    # ind[0:grid['imt']-1,:] = ind[1:grid['imt'],:]
+    # mask2[ind] = 1
+    # ind = (mask2==1)
+    # ind[:,0:grid['jmt']-1] = ind[:,1:grid['jmt']]
+    # mask2[ind] = 1
+    # ind = (mask2==0)
+    # kmt[ind] = 0
+    # grid['kmt'] = kmt
+    # grid['Y'], grid['X'] = np.meshgrid(np.arange(grid['jmt']),np.arange(grid['imt'])) # grid in index coordinates, without ghost cells
+    # # Triangulation for grid space to curvilinear space
+    # grid['tri'] = delaunay.Triangulation(grid['X'].flatten(),grid['Y'].flatten())
+    # # Triangulation for curvilinear space to grid space
+    # grid['trir'] = delaunay.Triangulation(grid['xr'].flatten(),grid['yr'].flatten())
+    # grid['trirllrho'] = delaunay.Triangulation(grid['lonr'].flatten(),grid['latr'].flatten())
+    # grid['zwt0'] = octant.depths.get_zw(grid['Vtransform'], grid['Vstretching'], grid['km']+1, 
+    #                 grid['theta_s'], grid['theta_b'], 
+    #                 grid['h'].T.copy(order='c'), 
+    #                 grid['hc'], zeta=0, Hscale=3)
+    # grid['zrt0'] = octant.depths.get_zrho(grid['Vtransform'], grid['Vstretching'], grid['km'], 
+    #                 grid['theta_s'], grid['theta_b'], 
+    #                 grid['h'].T.copy(order='c'), 
+    #                 grid['hc'], zeta=0, Hscale=3)
+    # # Change dzt to tracmass/fortran ordering
+    # grid['zwt0'] = grid['zwt0'].T.copy(order='f')
+    # grid['zrt0'] = grid['zrt0'].T.copy(order='f')
+    # # this should be the base grid layer thickness that doesn't change in time because it 
+    # # is for the reference vertical level
+    # grid['dzt0'] = grid['zwt0'][:,:,1:] - grid['zwt0'][:,:,:-1]
 
-    g.close()
+    # g.close()
 
     # horizontal_diffusivity project showed that relative dispersion did not
     # change between nsteps=25 and 50, but does between nsteps=5 and 25, and
@@ -197,8 +201,8 @@ def init():
     # lon0, lat0 = grid['basemap'](X, Y, inverse=True)
 
     # Start uniform array of drifters across domain using x,y coords
-    lon0 = grid['lonr'][1:-1,1:-1]
-    lat0 = grid['latr'][1:-1,1:-1]
+    x0 = grid['xr'][1:-1,1:-1]
+    y0 = grid['yr'][1:-1,1:-1]
 
     # surface drifters
     z0 = 's'  
@@ -214,5 +218,12 @@ def init():
     # Flag for streamlines. All the extra steps right after this are for streamlines.
     dostream = 0
 
-    return nsteps, N, ff, tseas, ah, av, lon0, lat0, \
-            z0, zpar, do3d, doturb, grid, dostream, doperiodic
+    # Initialize Tracpy class
+    tp = Tracpy(currents_filename, grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps,
+                N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, time_units=time_units,
+                dtFromTracmass=dtFromTracmass, usespherical=False)
+
+    return tp, x0, y0
+
+    # return nsteps, N, ff, tseas, ah, av, x0, y0, \
+    #         z0, zpar, do3d, doturb, grid, dostream, doperiodic

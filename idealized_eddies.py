@@ -44,13 +44,13 @@ def run():
         # Make symbolic links for run files from simulation in the main directory
         hisfileloc = run + '/shelfstrat_his.nc'
         grdfileloc = run + '/shelfstrat_grd.nc'
-        hisfiledes = 'ocean_his_0001.nc' # 'tracks/' + runname + '/ocean_his_0001.nc'
-        grdfiledes = 'grid.nc' # 'tracks/' + runname + '/grid.nc'
-        hiscmd = 'ln -sf ' + hisfileloc + ' ' + hisfiledes
-        grdcmd = 'ln -sf ' + grdfileloc + ' ' + grdfiledes
+        # hisfiledes = 'ocean_his_0001.nc' # 'tracks/' + runname + '/ocean_his_0001.nc'
+        # grdfiledes = 'grid.nc' # 'tracks/' + runname + '/grid.nc'
+        # hiscmd = 'ln -sf ' + hisfileloc + ' ' + hisfiledes
+        # grdcmd = 'ln -sf ' + grdfileloc + ' ' + grdfiledes
         # pdb.set_trace()
-        os.system(hiscmd)
-        os.system(grdcmd)
+        # os.system(hiscmd)
+        # os.system(grdcmd)
 
         # Start drifters daily in the simulations
         overallstartdate = datetime(0001, 1, 1, 0, 0)

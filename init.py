@@ -66,7 +66,7 @@ from tracpy.tracpy_class import Tracpy
 
 time_units = 'seconds since 0001-01-01'
 
-def init(name, ndays, grid_filename):
+def init(name, ndays, grid_filename, currents_filename):
     '''
     Initialization for seeding drifters at all shelf model grid points to be run
     forward.
@@ -76,7 +76,7 @@ def init(name, ndays, grid_filename):
     # loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
     # grid = tracpy.inout.readgrid(loc)
     # # Replace entries
-    currents_filename = 'ocean_his_0001.nc'
+    # currents_filename = 'ocean_his_0001.nc'
     # grid_filename = 'grid.nc'
     # grid = tracpy.inout.readgrid(loc)
     # g = netCDF.Dataset('grid.nc')

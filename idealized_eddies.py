@@ -49,8 +49,8 @@ def run():
         hiscmd = 'ln -sf ' + hisfileloc + ' ' + hisfiledes
         grdcmd = 'ln -sf ' + grdfileloc + ' ' + grdfiledes
         # pdb.set_trace()
-        # os.system(hiscmd)
-        # os.system(grdcmd)
+        os.system(hiscmd)
+        os.system(grdcmd)
 
         # Start drifters daily in the simulations
         overallstartdate = datetime(0001, 1, 1, 0, 0)

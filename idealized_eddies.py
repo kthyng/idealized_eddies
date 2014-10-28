@@ -13,8 +13,18 @@ import tracpy
 import init
 from datetime import datetime, timedelta
 from glob import glob
+from tracpy.tracpy_class import Tracpy
 
-# npieces = 12 # number of pieces to divide starting locations for drifters into, in x direction
+
+def init(name, ndays, grid_filename, currents_filename):
+    '''
+    Initialize parameters for idealized eddy simulations. 
+    Initialization for seeding drifters at all shelf model 
+    grid points to be run forward.
+    '''
+
+    time_units = 'seconds since 0001-01-01'
+
 
 def run():
 
@@ -25,17 +35,12 @@ def run():
         os.makedirs('figures')
 
     # Loop through all the simulations
-    # basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations-unbalanced/'
-    # runs = glob(basepath + 'shelfstrat*')
-    # # runs = [basepath + 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
-    basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations-balanced/'
-    # runs = glob(basepath + 'shelfstrat*')
-    runs = [basepath + 'shelfstrat_M2_8.94e-08_N2_1.00e-04_f_2.00e-05']
+    basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations/'
+    runs = glob(basepath + 'shelfstrat*')
 
     for run in runs:
 
-        runname = 'balanced/' + run.split('/')[-1]
-        # runname = 'unbalanced/' + run.split('/')[-1]
+        runname = run.split('/')[-1]
 
         # make directory for output
         if not os.path.exists('tracks/' + runname):
@@ -83,28 +88,9 @@ def run():
                 #                         grid=grid, dostream=dostream, doperiodic=doperiodic, savell=False)
                 xp, yp, zp, t, T0, U, V = tracpy.run.run(tp, date, x0, y0)
 
-            # # If basic figures don't exist, make them
-            # if not os.path.exists('figures/' + name + '*.png'):
-
-                # # Read in and plot tracks
-                # d = netCDF.Dataset('tracks/' + name + '.nc')
-                # lonp = d.variables['lonp'][:]
-                # latp = d.variables['latp'][:]
-                # # tracpy.plotting.tracks(lonp, latp, name, grid=grid)
-                # # tracpy.plotting.hist(lonp, latp, name, grid=grid, which='hexbin')
-                # d.close()
-                # # # Do transport plot
-                # tracpy.plotting.transport(name='all_f/N=5_dx=8/25days', fmod=date.isoformat()[0:13], 
-                #     extraname=date.isoformat()[0:13], 
-                #     Title='Transport on Shelf, for a week from ' + date.isoformat()[0:13], dmax=1.0)
-
             # Increment by 24 hours for next loop, to move through more quickly
-            # nh = nh + 24
             date = date + timedelta(hours=24)
 
-        # # Do transport plot
-        # tracpy.plotting.transport(name='all_f/N=5_dx=8/25days', fmod=startdate.isoformat()[0:7] + '*', 
-        #     extraname=startdate.isoformat()[0:7], Title='Transport on Shelf', dmax=1.0)
 
 
 if __name__ == "__main__":

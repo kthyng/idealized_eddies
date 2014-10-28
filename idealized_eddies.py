@@ -25,6 +25,63 @@ def init(name, ndays, grid_filename, currents_filename):
 
     time_units = 'seconds since 0001-01-01'
 
+    # horizontal_diffusivity project showed that relative dispersion did not
+    # change between nsteps=25 and 50, but does between nsteps=5 and 25, and
+    # interim numbers have not been tested yet.
+    nsteps = 19 # to approximate the output timing of the TXLA model 25 
+
+    # Number of steps to divide model output for outputting drifter location
+    N = 4 # to approximate the output timing of the TXLA model # 5
+
+    # Number of days
+    # ndays = 30
+
+    # This is a forward-moving simulation
+    ff = 1 
+
+    # Time between outputs
+    tseas = 10800.0 # time between output in seconds
+    ah = 0.
+    av = 0. # m^2/s
+
+    # Initial lon/lat locations for drifters
+    # The following few lines aren't necessary because the grid cells are uniformly 1km res
+    # # Start uniform array of drifters across domain using x,y coords
+    # dx = 1000 # initial separation distance of drifters, in meters
+    # xcrnrs = np.array([grid['xr'][1:-1,:].min(), grid['xr'][1:-1,:].max()])
+    # ycrnrs = np.array([grid['yr'][1:-1,:].min(), grid['yr'][1:-1,:].max()])
+    # X, Y = np.meshgrid(np.arange(xcrnrs[0], xcrnrs[1], dx), np.arange(ycrnrs[0], ycrnrs[1], dx))
+    # lon0, lat0 = grid['basemap'](X, Y, inverse=True)
+
+    # surface drifters
+    z0 = 's'  
+    zpar = 29 # 30 layers
+    # zpar = grid['km']-1
+
+    # for 3d flag, do3d=0 makes the run 2d and do3d=1 makes the run 3d
+    do3d = 0
+    doturb = 0
+
+    # for periodic boundary conditions in the x direction
+    doperiodic = 1
+
+    # Flag for streamlines. All the extra steps right after this are for streamlines.
+    dostream = 0
+
+    # Initialize Tracpy class
+    tp = Tracpy(currents_filename, grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps,
+                N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, time_units=time_units,
+                usespherical=False, savell=False, doperiodic=1)
+
+    # force grid reading
+    tp._readgrid()
+
+    # Start uniform array of drifters across domain using x,y coords
+    x0 = tp.grid['xr'][1:-1,1:-1]
+    y0 = tp.grid['yr'][1:-1,1:-1]
+
+    return tp, x0, y0
+
 
 def run():
 

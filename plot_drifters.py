@@ -31,22 +31,22 @@ donewtails = True # for when not doing old tails
 
 # Read in drifter tracks
 dd = 1 # 500 # drifter decimation
-startdate = '0001-01-15T00' #14T00'
+startdate = '0001-01-21T00' #14T00'
 # runs = ['tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 # runs = glob.glob('tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_7.45*')
 # runs = glob.glob('tracks/shelfstrat_M2_1.00e-06*')
-# # runs row 1
-# base = 'tracks/shelfstrat_M2_2.00e-07_N2_1.00e-04_f_'
-# runs = [base + '2.00e-05', base + '2.83e-05', base + '3.46e-05', base + '4.47e-05', base + '6.32e-05']
+# runs row 1
+base = 'tracks/shelfstrat_M2_2.00e-07_N2_1.00e-04_f_'
+runs = [base + '2.00e-05', base + '2.83e-05', base + '3.46e-05', base + '4.47e-05', base + '6.32e-05']
 # # runs row 2
 # base = 'tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_'
 # runs = [base + '3.33e-05', base + '4.71e-05', base + '5.77e-05', base + '7.45e-05', base + '1.05e-04']
 # # runs row 3
 # base = 'tracks/shelfstrat_M2_5.00e-07_N2_1.00e-04_f_'
 # runs = [base + '5.00e-05', base + '7.07e-05', base + '8.66e-05', base + '1.12e-04', base + '1.58e-04']
-# runs row 4
-base = 'tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_'
-runs = [base + '1.00e-04', base + '1.41e-04', base + '1.73e-04', base + '2.24e-04', base + '3.16e-04']
+# # runs row 4
+# base = 'tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_'
+# runs = [base + '1.00e-04', base + '1.41e-04', base + '1.73e-04', base + '2.24e-04', base + '3.16e-04']
 
 for run in runs:
     # pdb.set_trace()
@@ -60,9 +60,48 @@ for run in runs:
     d = netCDF.Dataset(run + '/' + startdate + 'gc.nc')
     xg = d.variables['xg'][::dd,:]
     yg = d.variables['yg'][::dd,:]
-    ind = (xg == -1)
-    xp, yp, _ = tracpy.tools.interpolate2d(xg, yg, grid, 'm_ij2xy')
-    xp[ind] = np.nan; yp[ind] = np.nan
+
+
+    ind = abs(np.diff(xg))>3
+    for j in xrange(ind.shape[0]):
+        icrits = find(ind[j,:])
+        xg[j,icrits] = np.nan
+    # # Fix x position of drifters for periodic boundaries in the x direction
+    # xg = np.unwrap((xg*(2*np.pi)/256.), axis=-1)*(256./(2*np.pi))
+
+    # # Need to first eliminate the interpolated points between ends in the periodic direction
+    # # Identify these points by having large jumps for two consecutive x-direction positions
+    # ind = abs(np.diff(xg, axis=1))>3
+    # for j in xrange(ind.shape[0]):
+    #     doloop = True
+    #     icrits = (find(ind[j,1:] & ind[j,:-1]) + 1).astype(list) # index of weird interpolated point
+    #     if icrits.size == 0: # if this exists for this drifter
+    #         doloop = False
+    #     while doloop:
+    #         icrit = icrits[0]
+    #         xg[j,icrit] = .5*(xg[j,icrit-1] + xg[j,icrit+1])
+    #         # update indices in case any of these were in a row
+    #         ind[j,:] = abs(np.diff(xg[j,:]))>3
+    #         icrits = find(ind[j,1:] & ind[j,:-1]) + 1 # index of weird interpolated point
+    #         # test to see if this worked by seeing if the same critical index is still there
+    #         if (icrits.size > 0) and (icrits[0] == icrit): # then it didn't work, try a different approach
+    #             if xg[j,icrit+1]>250: # trying to wrap left to right
+    #                 xg[j,icrit] = xg[j,icrit-1] - (256 - xg[j,icrit+1])
+    #             elif xg[j,icrit+1]<100: # trying to wrap right to left
+    #                 xg[j,icrit] = xg[j,icrit-1] + (xg[j,icrit+1])
+    #             # unwrap again
+    #             xg[j,:] = np.unwrap((xg[j,:]*(2*np.pi)/256.), axis=-1)*(256./(2*np.pi))
+            
+    #         if icrits.size == 0:
+    #             doloop = False
+
+    # pdb.set_trace()
+
+
+    xp = xg.copy()*1000; yp = yg.copy()*1000
+    # ind = (xg == -1)
+    # xp, yp, _ = tracpy.tools.interpolate2d(xg, yg, grid, 'm_ij2xy')
+    # xp[ind] = np.nan; yp[ind] = np.nan
     tp = d.variables['tp'][0,:]
     # d.close()
 
@@ -117,26 +156,28 @@ for run in runs:
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
-    for i in np.arange(i5days,nt,5): # only plot for every circulation model output
+    di = 4
+    for i in np.arange(i5days,nt,di): # only plot for every circulation model output
+        # pdb.set_trace()
     # for i in np.arange(i5days,nt+1,5):
         # if i==545:
         #     pdb.set_trace()
 
-        fname = dirname + '/' + str(dates[i])[3:-9] + '.png'
+        fname = dirname + '/' + str(dates[i])[3:-6].replace(' ', '-') + '.png'
         # if not dotails:
         #     itxla = np.where(datestxla==dates[i])[0][0] # find time index to use for model output
         #     salt = nc.variables['salt'][itxla,-1,:,:] # surface salinity
 
         if os.path.exists(fname):
             # Update indices
-            i5daysago += 5
-            i2daysago += 5
+            i5daysago += di
+            i2daysago += di
             continue
 
         # Plot background
-        fig = plt.figure(figsize=(14,8))
+        fig = plt.figure(figsize=(14,5.5))
         ax = fig.add_subplot(111)
-        fig.subplots_adjust(left=0.07, bottom=0.06, right=0.99, top=1.0)
+        fig.subplots_adjust(left=0.07, bottom=0.12, right=0.99, top=1.0)
 
         if dotails:
             # Plot 5 days ago to 2 days ago
@@ -152,15 +193,26 @@ for run in runs:
 
             if donewtails:
 
-                istart = i-30*5 # when to start plotting lines back in time
+                istart = i-(24./3*4*0.25) # when to start plotting lines back in time
                 if istart<0: istart=0
 
-                # Plot drifter locations
-                ax.plot(xp[ind20,istart:i].T, yp[ind20,istart:i].T, '-', color=rgb[0,:], lw=0.5)
-                ax.plot(xp[ind50,istart:i].T, yp[ind50,istart:i].T, '-', color=rgb[1,:], lw=0.5)
-                ax.plot(xp[ind100,istart:i].T, yp[ind100,istart:i].T, '-', color=rgb[2,:], lw=0.5)
-                ax.plot(xp[ind500,istart:i].T, yp[ind500,istart:i].T, '-', color=rgb[3,:], lw=0.5)
-                ax.plot(xp[ind3500,istart:i].T, yp[ind3500,istart:i].T, '-', color=rgb[4,:], lw=0.5)
+                if i==0: # plot dots in starting locations
+
+                    # Plot drifter locations
+                    ax.plot(xp[ind20,i].T, yp[ind20,i].T, '.', color=rgb[0,:], ms=0.6)
+                    ax.plot(xp[ind50,i].T, yp[ind50,i].T, '.', color=rgb[1,:], ms=0.6)
+                    ax.plot(xp[ind100,i].T, yp[ind100,i].T, '.', color=rgb[2,:], ms=0.6)
+                    ax.plot(xp[ind500,i].T, yp[ind500,i].T, '.', color=rgb[3,:], ms=0.6)
+                    ax.plot(xp[ind3500,i].T, yp[ind3500,i].T, '.', color=rgb[4,:], ms=0.6)
+
+                else:
+
+                    # Plot drifter locations
+                    ax.plot(xp[ind20,istart:i+1].T, yp[ind20,istart:i+1].T, '-', color=rgb[0,:], lw=0.5)
+                    ax.plot(xp[ind50,istart:i+1].T, yp[ind50,istart:i+1].T, '-', color=rgb[1,:], lw=0.5)
+                    ax.plot(xp[ind100,istart:i+1].T, yp[ind100,istart:i+1].T, '-', color=rgb[2,:], lw=0.5)
+                    ax.plot(xp[ind500,istart:i+1].T, yp[ind500,istart:i+1].T, '-', color=rgb[3,:], lw=0.5)
+                    ax.plot(xp[ind3500,istart:i+1].T, yp[ind3500,istart:i+1].T, '-', color=rgb[4,:], lw=0.5)
 
             else:
 
@@ -178,7 +230,7 @@ for run in runs:
         # pdb.set_trace()
         # plt.axis('tight')
         ax.set_xlim(1,255)
-        ax.set_ylim(1,129)
+        ax.set_ylim(1,90)#129)
         ax.set_aspect(1.0)
         ax.set_ylabel('Across channel [km]')
         ax.set_xlabel('Along channel [km]')
@@ -211,8 +263,8 @@ for run in runs:
 
 
         # Update indices
-        i5daysago += 5
-        i2daysago += 5
+        i5daysago += di
+        i2daysago += di
 
         fig.savefig(fname)
 

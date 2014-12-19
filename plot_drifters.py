@@ -27,7 +27,7 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 # whether to do tails on drifters or not (don't with low decimation)
 dotails = False # True or False
-donewtails = True # for when not doing old tails
+dostreaklines = True # for when not doing old tails
 
 # Read in drifter tracks
 dd = 1 # 500 # drifter decimation
@@ -120,11 +120,13 @@ for run in runs:
         # near-shore
         # ind10 = depthp<=10
         ind20 = depthp<=20
-        ind50 = (depthp>20)*(depthp<=50)
-        ind100 = (depthp>50)*(depthp<=100)
-        # offshore
-        ind500 = (depthp>100)*(depthp<=500)
-        ind3500 = depthp>500
+        ind40 = (depthp>20)*(depthp<=40)
+        ind60 = (depthp>40)*(depthp<=60)
+        ind80 = (depthp>60)*(depthp<=80)
+        ind100 = (depthp>80)*(depthp<=100)
+        # # offshore
+        # ind500 = (depthp>100)*(depthp<=500)
+        # ind3500 = depthp>500
 
         # colors for drifters
         rgb = plt.cm.get_cmap('winter_r')(np.linspace(0,1,6))[:-1,:3] # skip last entry where it levels off in lightness
@@ -191,7 +193,7 @@ for run in runs:
 
         else:
 
-            if donewtails:
+            if dostreaklines:
 
                 istart = i-(24./3*4*0.25) # when to start plotting lines back in time
                 if istart<0: istart=0
@@ -200,29 +202,29 @@ for run in runs:
 
                     # Plot drifter locations
                     ax.plot(xp[ind20,i].T, yp[ind20,i].T, '.', color=rgb[0,:], ms=0.6)
-                    ax.plot(xp[ind50,i].T, yp[ind50,i].T, '.', color=rgb[1,:], ms=0.6)
-                    ax.plot(xp[ind100,i].T, yp[ind100,i].T, '.', color=rgb[2,:], ms=0.6)
-                    ax.plot(xp[ind500,i].T, yp[ind500,i].T, '.', color=rgb[3,:], ms=0.6)
-                    ax.plot(xp[ind3500,i].T, yp[ind3500,i].T, '.', color=rgb[4,:], ms=0.6)
+                    ax.plot(xp[ind40,i].T, yp[ind40,i].T, '.', color=rgb[1,:], ms=0.6)
+                    ax.plot(xp[ind60,i].T, yp[ind60,i].T, '.', color=rgb[2,:], ms=0.6)
+                    ax.plot(xp[ind80,i].T, yp[ind80,i].T, '.', color=rgb[3,:], ms=0.6)
+                    ax.plot(xp[ind100,i].T, yp[ind100,i].T, '.', color=rgb[4,:], ms=0.6)
 
                 else:
 
                     # Plot drifter locations
                     ax.plot(xp[ind20,istart:i+1].T, yp[ind20,istart:i+1].T, '-', color=rgb[0,:], lw=0.5)
-                    ax.plot(xp[ind50,istart:i+1].T, yp[ind50,istart:i+1].T, '-', color=rgb[1,:], lw=0.5)
-                    ax.plot(xp[ind100,istart:i+1].T, yp[ind100,istart:i+1].T, '-', color=rgb[2,:], lw=0.5)
-                    ax.plot(xp[ind500,istart:i+1].T, yp[ind500,istart:i+1].T, '-', color=rgb[3,:], lw=0.5)
-                    ax.plot(xp[ind3500,istart:i+1].T, yp[ind3500,istart:i+1].T, '-', color=rgb[4,:], lw=0.5)
+                    ax.plot(xp[ind40,istart:i+1].T, yp[ind40,istart:i+1].T, '-', color=rgb[1,:], lw=0.5)
+                    ax.plot(xp[ind60,istart:i+1].T, yp[ind60,istart:i+1].T, '-', color=rgb[2,:], lw=0.5)
+                    ax.plot(xp[ind80,istart:i+1].T, yp[ind80,istart:i+1].T, '-', color=rgb[3,:], lw=0.5)
+                    ax.plot(xp[ind100,istart:i+1].T, yp[ind100,istart:i+1].T, '-', color=rgb[4,:], lw=0.5)
 
             else:
 
                 # Plot drifter locations
                 # ax.plot(xp[:,i].T, yp[:,i].T, 'o', color='g', ms=2, mec='None')
                 ax.plot(xp[ind20,i].T, yp[ind20,i].T, 'o', color=rgb[0,:], ms=ms, mec='None')
-                ax.plot(xp[ind50,i].T, yp[ind50,i].T, 'o', color=rgb[1,:], ms=ms, mec='None')
-                ax.plot(xp[ind100,i].T, yp[ind100,i].T, 'o', color=rgb[2,:], ms=ms, mec='None')
-                ax.plot(xp[ind500,i].T, yp[ind500,i].T, 'o', color=rgb[3,:], ms=ms, mec='None')
-                ax.plot(xp[ind3500,i].T, yp[ind3500,i].T, 'o', color=rgb[4,:], ms=ms, mec='None')
+                ax.plot(xp[ind40,i].T, yp[ind40,i].T, 'o', color=rgb[1,:], ms=ms, mec='None')
+                ax.plot(xp[ind60,i].T, yp[ind60,i].T, 'o', color=rgb[2,:], ms=ms, mec='None')
+                ax.plot(xp[ind80,i].T, yp[ind80,i].T, 'o', color=rgb[3,:], ms=ms, mec='None')
+                ax.plot(xp[ind100,i].T, yp[ind100,i].T, 'o', color=rgb[4,:], ms=ms, mec='None')
 
             # # Overlay surface salinity
             # ax.contour(grid['xr'].T, grid['yr'].T, salt, [33], colors='0.1', zorder=12, linewidths=2)
@@ -253,7 +255,7 @@ for run in runs:
             cax.tick_params(axis='y', labelleft=False, left=False, right=False)
             cax.tick_params(axis='x', top=False, bottom=False, labelsize=15)
             cax.set_xticks(np.arange(-0.5, 5, 1.0))
-            cax.set_xticklabels(('0', '20', '50', '100', '500', '3500'))
+            cax.set_xticklabels(('0', '20', '40', '60', '80', '100'))
             cax.set_title('Initial drifter depth [m]', fontsize=14)
         # pdb.set_trace()
 

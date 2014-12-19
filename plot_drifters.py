@@ -27,10 +27,11 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 # whether to do tails on drifters or not (don't with low decimation)
 dotails = False # True or False
+donewtails = True # for when not doing old tails
 
 # Read in drifter tracks
 dd = 1 # 500 # drifter decimation
-startdate = '0001-01-16T00' #14T00'
+startdate = '0001-01-15T00' #14T00'
 # runs = ['tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 # runs = glob.glob('tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_7.45*')
 # runs = glob.glob('tracks/shelfstrat_M2_1.00e-06*')
@@ -40,12 +41,12 @@ startdate = '0001-01-16T00' #14T00'
 # # runs row 2
 # base = 'tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_'
 # runs = [base + '3.33e-05', base + '4.71e-05', base + '5.77e-05', base + '7.45e-05', base + '1.05e-04']
-# runs row 3
-base = 'tracks/shelfstrat_M2_5.00e-07_N2_1.00e-04_f_'
-runs = [base + '5.00e-05', base + '7.07e-05', base + '8.66e-05', base + '1.12e-04', base + '1.58e-04']
-# # runs row 4
-# base = 'tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_'
-# runs = [base + '1.00e-04', base + '1.41e-04', base + '1.73e-04', base + '2.24e-04', base + '3.16e-04']
+# # runs row 3
+# base = 'tracks/shelfstrat_M2_5.00e-07_N2_1.00e-04_f_'
+# runs = [base + '5.00e-05', base + '7.07e-05', base + '8.66e-05', base + '1.12e-04', base + '1.58e-04']
+# runs row 4
+base = 'tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_'
+runs = [base + '1.00e-04', base + '1.41e-04', base + '1.73e-04', base + '2.24e-04', base + '3.16e-04']
 
 for run in runs:
     # pdb.set_trace()
@@ -116,7 +117,7 @@ for run in runs:
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
-    for i in np.arange(i5days,nt,5):
+    for i in np.arange(i5days,nt,5): # only plot for every circulation model output
     # for i in np.arange(i5days,nt+1,5):
         # if i==545:
         #     pdb.set_trace()
@@ -149,13 +150,27 @@ for run in runs:
 
         else:
 
-            # Plot drifter locations
-            # ax.plot(xp[:,i].T, yp[:,i].T, 'o', color='g', ms=2, mec='None')
-            ax.plot(xp[ind20,i].T, yp[ind20,i].T, 'o', color=rgb[0,:], ms=ms, mec='None')
-            ax.plot(xp[ind50,i].T, yp[ind50,i].T, 'o', color=rgb[1,:], ms=ms, mec='None')
-            ax.plot(xp[ind100,i].T, yp[ind100,i].T, 'o', color=rgb[2,:], ms=ms, mec='None')
-            ax.plot(xp[ind500,i].T, yp[ind500,i].T, 'o', color=rgb[3,:], ms=ms, mec='None')
-            ax.plot(xp[ind3500,i].T, yp[ind3500,i].T, 'o', color=rgb[4,:], ms=ms, mec='None')
+            if donewtails:
+
+                istart = i-30*5 # when to start plotting lines back in time
+                if istart<0: istart=0
+
+                # Plot drifter locations
+                ax.plot(xp[ind20,istart:i].T, yp[ind20,istart:i].T, '-', color=rgb[0,:], lw=0.5)
+                ax.plot(xp[ind50,istart:i].T, yp[ind50,istart:i].T, '-', color=rgb[1,:], lw=0.5)
+                ax.plot(xp[ind100,istart:i].T, yp[ind100,istart:i].T, '-', color=rgb[2,:], lw=0.5)
+                ax.plot(xp[ind500,istart:i].T, yp[ind500,istart:i].T, '-', color=rgb[3,:], lw=0.5)
+                ax.plot(xp[ind3500,istart:i].T, yp[ind3500,istart:i].T, '-', color=rgb[4,:], lw=0.5)
+
+            else:
+
+                # Plot drifter locations
+                # ax.plot(xp[:,i].T, yp[:,i].T, 'o', color='g', ms=2, mec='None')
+                ax.plot(xp[ind20,i].T, yp[ind20,i].T, 'o', color=rgb[0,:], ms=ms, mec='None')
+                ax.plot(xp[ind50,i].T, yp[ind50,i].T, 'o', color=rgb[1,:], ms=ms, mec='None')
+                ax.plot(xp[ind100,i].T, yp[ind100,i].T, 'o', color=rgb[2,:], ms=ms, mec='None')
+                ax.plot(xp[ind500,i].T, yp[ind500,i].T, 'o', color=rgb[3,:], ms=ms, mec='None')
+                ax.plot(xp[ind3500,i].T, yp[ind3500,i].T, 'o', color=rgb[4,:], ms=ms, mec='None')
 
             # # Overlay surface salinity
             # ax.contour(grid['xr'].T, grid['yr'].T, salt, [33], colors='0.1', zorder=12, linewidths=2)

@@ -145,15 +145,20 @@ def run():
             np.savez(fname, D2=D2, nnans=nnans, pairs=pairs, days=days)
 
         # plot
-        if '2.00e-07' in sim:
-            color = '0.7'
-        elif '3.33e-07' in sim:
-            color = '0.4'
-        elif '5.00e-07' in sim:
-            color = '0.1'
-        elif '1.00e-06' in sim:
+        if '2.00e-07' in sim: # row 4
+            color = 'b' # '0.7'
+        elif '3.33e-07' in sim: # row 3
+            color = 'g' # '0.4'
+        elif '5.00e-07' in sim: # row 2
+            color = 'darkorange' # '0.1'
+        elif '1.00e-06' in sim: # row 1
             color = 'r'
-        ax.semilogy(days, D2, color=color, lw=3, alpha=0.7)
+        # print sim
+        # dalpha = (1-.25)/4.
+        # alpha = 0.25+dalpha*np.mod(i,5)
+        linestyles = ['-', '--', '-.', ':', 'o:']
+        dds = [1,1,1,1,20]
+        ax.semilogy(days[::dds[np.mod(i,5)]], D2[::dds[np.mod(i,5)]], linestyles[np.mod(i,5)], color=color, lw=4, mec=None, alpha=0.6)
 
         # for ipair in pairs:
         #     dist = np.sqrt((xg[ipair[0],:] - xg[ipair[1],:])**2 + (yg[ipair[0],:] - yg[ipair[1],:])**2)
@@ -163,16 +168,29 @@ def run():
         #         print ipair
 
     ax.set_xlabel('Days 20 to 30')
-    ax.set_ylabel('Mean squared separation distance [km$^2$]')
+    ax.set_ylabel('Mean squared separation distance [km$^2\!$]')
 
     ax.text(0.05, 0.95, 'Row 1', color='r', transform=ax.transAxes)
-    ax.text(0.05, 0.92, 'Row 2', color='0.1', transform=ax.transAxes)
-    ax.text(0.05, 0.89, 'Row 3', color='0.4', transform=ax.transAxes)
-    ax.text(0.05, 0.86, 'Row 4', color='0.7', transform=ax.transAxes)
+    ax.text(0.05, 0.92, 'Row 2', color='orange', transform=ax.transAxes)
+    ax.text(0.05, 0.89, 'Row 3', color='g', transform=ax.transAxes)
+    ax.text(0.05, 0.86, 'Row 4', color='b', transform=ax.transAxes)
 
     fig.savefig('figures/D2.png', bbox_inches='tight')
     fig.savefig('figures/D2.pdf', bbox_inches='tight')
 
+    # add on TXLA shelf eddy region comparison
+    shelfloc = '/rho/raid/home/kthyng/projects/shelf_transport/'
+    fnameS = shelfloc + 'calcs/dispersion/hist/D2/r1/D2aveS.npz'
+    D2aveS = np.load(fnameS)['D2aveS']
+    dtracks = netCDF.Dataset(shelfloc + 'tracks/2004-01-01T00gc.nc')
+    tp = dtracks.variables['tp']
+    days2 = (tp-tp[0])/(3600.*24)
+    dtracks.close()
+    i10 = find(days2<=10)[-1]
+    plt.semilogy(days2[:i10], D2aveS[70,45,:i10], '-', color='0.3', lw=4) # summer
 
-# if __name__ == "__main__":
-#     run()    
+    fig.savefig('figures/D2-withTXLA.png', bbox_inches='tight')
+    fig.savefig('figures/D2-withTXLA.pdf', bbox_inches='tight')
+
+if __name__ == "__main__":
+    run()    

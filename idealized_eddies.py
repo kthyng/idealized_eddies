@@ -44,19 +44,9 @@ def init(name, ndays, grid_filename, currents_filename):
     ah = 0.
     av = 0. # m^2/s
 
-    # Initial lon/lat locations for drifters
-    # The following few lines aren't necessary because the grid cells are uniformly 1km res
-    # # Start uniform array of drifters across domain using x,y coords
-    # dx = 1000 # initial separation distance of drifters, in meters
-    # xcrnrs = np.array([grid['xr'][1:-1,:].min(), grid['xr'][1:-1,:].max()])
-    # ycrnrs = np.array([grid['yr'][1:-1,:].min(), grid['yr'][1:-1,:].max()])
-    # X, Y = np.meshgrid(np.arange(xcrnrs[0], xcrnrs[1], dx), np.arange(ycrnrs[0], ycrnrs[1], dx))
-    # lon0, lat0 = grid['basemap'](X, Y, inverse=True)
-
     # surface drifters
     z0 = 's'  
     zpar = 29 # 30 layers
-    # zpar = grid['km']-1
 
     # for 3d flag, do3d=0 makes the run 2d and do3d=1 makes the run 3d
     do3d = 0
@@ -103,6 +93,8 @@ def run():
         if not os.path.exists('tracks/' + runname):
             os.makedirs('tracks/' + runname)
 
+        # pdb.set_trace()
+
         # Make symbolic links for run files from simulation in the main directory
         hisfileloc = run + '/shelfstrat_his.nc'
         grdfileloc = run + '/shelfstrat_grd.nc'
@@ -114,39 +106,37 @@ def run():
         # os.system(hiscmd)
         # os.system(grdcmd)
 
-        # Start drifters daily in the simulations
-        overallstartdate = datetime(0001, 1, 1, 0, 0)
-        overallstopdate = datetime(0001, 1, 31, 0, 0)
+        # just do one simulation now
+        f = netCDF.Dataset(hisfileloc)
+        t = f.variables['ocean_time'][:]
+        days = t[-1]/86400. # total number of days for simulation
+        daysdate = datetime(0001, 1, 1, 0, 0) + timedelta(days=int(days)) # end date of ocean simulation
+        date = daysdate - timedelta(days=7) # date to start drifter simulation
 
-        date = overallstartdate
+        # # Start drifters daily in the simulations
+        # overallstartdate = datetime(0001, 1, 1, 0, 0)
+        # overallstopdate = datetime(0001, 1, 31, 0, 0)
 
-        # Start from the beginning and add days on for loop
-        # keep running until we hit the next month
-        while date < overallstopdate:
+        # date = overallstartdate
 
-            name = date.isoformat()[0:13]
+        # # Start from the beginning and add days on for loop
+        # # keep running until we hit the next month
+        # while date < overallstopdate:
 
-            # If the particle trajectories have not been run, run them
-            if not os.path.exists('tracks/' + runname + '/' + name + '.nc') and \
-                not os.path.exists('tracks/' + runname + '/' + name + 'gc.nc'):
+        name = date.isoformat()[0:13]
 
-                # Read in simulation initialization
-                ndays = (overallstopdate-date).days
-                tp, x0, y0 = init.init(runname + '/' + name, ndays, grdfileloc, hisfileloc)
-                # nstep, N, ff, tseas, ah, av, lon0, lat0, z0, zpar, do3d, doturb, \
-                #         grid, dostream, doperiodic = init.init()
-                # pdb.set_trace()
-                # Run tracpy
-                # Save directly to grid coordinates
-                # lonp, latp, zp, t, grid \
-                #     = tracpy.run.run(['ocean_his_0001.nc',''], 
-                #                         nstep, ndays, ff, date, tseas, ah, av, \
-                #                         lon0, lat0, z0, zpar, do3d, doturb, runname + '/' + name, N=N,  \
-                #                         grid=grid, dostream=dostream, doperiodic=doperiodic, savell=False)
-                xp, yp, zp, t, T0, U, V = tracpy.run.run(tp, date, x0, y0)
+        # If the particle trajectories have not been run, run them
+        if not os.path.exists('tracks/' + runname + '/' + name + '.nc') and \
+            not os.path.exists('tracks/' + runname + '/' + name + 'gc.nc'):
 
-            # Increment by 24 hours for next loop, to move through more quickly
-            date = date + timedelta(hours=24)
+            # Read in simulation initialization
+            ndays = 7 #(overallstopdate-date).days
+            tp, x0, y0 = init(runname + '/' + name, ndays, grdfileloc, hisfileloc)
+
+            xp, yp, zp, t, T0, U, V = tracpy.run.run(tp, date, x0, y0)
+
+        # # Increment by 24 hours for next loop, to move through more quickly
+        # date = date + timedelta(hours=24)
 
 
 

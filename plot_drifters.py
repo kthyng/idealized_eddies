@@ -31,13 +31,14 @@ dostreaklines = True # for when not doing old tails
 
 # Read in drifter tracks
 dd = 1 # 500 # drifter decimation
-startdate = '0001-01-21T00' #14T00'
+
+# startdate = '0001-01-21T00' #14T00'
 # runs = ['tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 # runs = glob.glob('tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_7.45*')
-# runs = glob.glob('tracks/shelfstrat_M2_1.00e-06*')
-# runs row 1
-base = 'tracks/shelfstrat_M2_2.00e-07_N2_1.00e-04_f_'
-runs = [base + '2.00e-05', base + '2.83e-05', base + '3.46e-05', base + '4.47e-05', base + '6.32e-05']
+runs = glob.glob('tracks/*/*')
+# # runs row 1
+# base = 'tracks/shelfstrat_M2_2.00e-07_N2_1.00e-04_f_'
+# runs = [base + '2.00e-05', base + '2.83e-05', base + '3.46e-05', base + '4.47e-05', base + '6.32e-05']
 # # runs row 2
 # base = 'tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_'
 # runs = [base + '3.33e-05', base + '4.71e-05', base + '5.77e-05', base + '7.45e-05', base + '1.05e-04']
@@ -49,15 +50,14 @@ runs = [base + '2.00e-05', base + '2.83e-05', base + '3.46e-05', base + '4.47e-0
 # runs = [base + '1.00e-04', base + '1.41e-04', base + '1.73e-04', base + '2.24e-04', base + '3.16e-04']
 
 for run in runs:
-    # pdb.set_trace()
 
     # read in grid
     basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations/'
-    grdfileloc = basepath + run.split('/')[-1] + '/shelfstrat_grd.nc'
-    hisfileloc = basepath + run.split('/')[-1] + '/shelfstrat_his.nc'
+    grdfileloc = basepath + run.split('/')[-2] + '/shelfstrat_grd.nc'
+    hisfileloc = basepath + run.split('/')[-2] + '/shelfstrat_his.nc'
     grid = tracpy.inout.readgrid(grdfileloc, usebasemap=False, usespherical=False)
 
-    d = netCDF.Dataset(run + '/' + startdate + 'gc.nc')
+    d = netCDF.Dataset(run)
     xg = d.variables['xg'][::dd,:]
     yg = d.variables['yg'][::dd,:]
 
@@ -154,7 +154,7 @@ for run in runs:
     nt = tp.size # total number of time indices
     # for i in np.arange(0,nt+1,5):
 
-    dirname = 'figures/drifters/dd' + str(dd) + '/' + run.split('/')[-1] + '/' + startdate
+    dirname = 'figures/drifters/dd' + str(dd) + '/' + run.split('/')[-2] + '/' + run.split('/')[-1]
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 

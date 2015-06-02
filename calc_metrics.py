@@ -43,6 +43,7 @@ ax = fig.add_subplot(111)
 for i, sim in enumerate(sims):
 
     fname = 'calcs/D2/' + sim.split('/')[-1] + '.npz'
+    print fname
 
     if os.path.exists(fname):
 
@@ -68,35 +69,40 @@ for i, sim in enumerate(sims):
         # in the next logic tests
         xg = np.unwrap((xg*(2*np.pi)/256.), axis=-1)*(256./(2*np.pi))
 
-        # Need to first eliminate the interpolated points between ends in the periodic direction
-        # Identify these points by having large jumps for two consecutive x-direction positions
-        ind = abs(np.diff(xg, axis=1))>3
-        for j in xrange(ind.shape[0]):
-            doloop = True
-            icrits = (find(ind[j,1:] & ind[j,:-1]) + 1).astype(list) # index of weird interpolated point
-            if icrits.size == 0: # if this exists for this drifter
-                doloop = False
-            while doloop:
-                icrit = icrits[0]
-                xg[j,icrit] = .5*(xg[j,icrit-1] + xg[j,icrit+1])
-                # update indices in case any of these were in a row
-                ind[j,:] = abs(np.diff(xg[j,:]))>3
-                icrits = find(ind[j,1:] & ind[j,:-1]) + 1 # index of weird interpolated point
-                # test to see if this worked by seeing if the same critical index is still there
-                if (icrits.size > 0) and (icrits[0] == icrit): # then it didn't work, try a different approach
-                    if xg[j,icrit+1]>250: # trying to wrap left to right
-                        xg[j,icrit] = xg[j,icrit-1] - (256 - xg[j,icrit+1])
-                    elif xg[j,icrit+1]<100: # trying to wrap right to left
-                        xg[j,icrit] = xg[j,icrit-1] + (xg[j,icrit+1])
-                    # unwrap again
-                    xg[j,:] = np.unwrap((xg[j,:]*(2*np.pi)/256.), axis=-1)*(256./(2*np.pi))
+        # # Need to first eliminate the interpolated points between ends in the periodic direction
+        # # Identify these points by having large jumps for two consecutive x-direction positions
+        # print 'preprocessing...'
+        # ind = abs(np.diff(xg, axis=1))>5
+        # for j in xrange(ind.shape[0]):
+        #     doloop = True
+        #     icrits = (find(ind[j,1:] & ind[j,:-1]) + 1).astype(list) # index of weird interpolated point
+        #     if icrits.size == 0: # if this exists for this drifter
+        #         doloop = False
+        #     while doloop:
+        #         if 142 in icrits:
+        #             pdb.set_trace()
+        #         icrit = icrits[0]
+        #         print icrit
+        #         xg[j,icrit] = .5*(xg[j,icrit-1] + xg[j,icrit+1])
+        #         # update indices in case any of these were in a row
+        #         ind[j,:] = abs(np.diff(xg[j,:]))>5
+        #         icrits = find(ind[j,1:] & ind[j,:-1]) + 1 # index of weird interpolated point
+        #         # test to see if this worked by seeing if the same critical index is still there
+        #         if (icrits.size > 0) and (icrits[0] == icrit): # then it didn't work, try a different approach
+        #             if xg[j,icrit+1]>250: # trying to wrap left to right
+        #                 xg[j,icrit] = xg[j,icrit-1] - (256 - xg[j,icrit+1])
+        #             elif xg[j,icrit+1]<100: # trying to wrap right to left
+        #                 xg[j,icrit] = xg[j,icrit-1] + (xg[j,icrit+1])
+        #             # unwrap again
+        #             xg[j,:] = np.unwrap((xg[j,:]*(2*np.pi)/256.), axis=-1)*(256./(2*np.pi))
                 
-                if icrits.size == 0:
-                    doloop = False
+        #         if icrits.size == 0:
+        #             doloop = False
 
         d.close()
 
         # Run calculation
+        print 'relative dispersion calculation...'
         D2, nnans, pairs = tracpy.calcs.rel_dispersion(xg*1000, yg*1000, r=[0.95, 1.05], squared=True, spherical=False)
 
         # Save

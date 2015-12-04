@@ -35,7 +35,8 @@ dd = 1 # 500 # drifter decimation
 # startdate = '0001-01-21T00' #14T00'
 # runs = ['tracks/shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 # runs = glob.glob('tracks/shelfstrat_M2_3.33e-07_N2_1.00e-04_f_7.45*')
-runs = glob.glob('tracks/*/*')
+# runs = glob.glob('tracks/*/*')
+runs = ['tracks/shelfstrat_M2_3.54e-07_N2_1.00e-04_f_5.00e-05/0001-01-24T00gc.nc']
 # # runs row 1
 # base = 'tracks/shelfstrat_M2_2.00e-07_N2_1.00e-04_f_'
 # runs = [base + '2.00e-05', base + '2.83e-05', base + '3.46e-05', base + '4.47e-05', base + '6.32e-05']

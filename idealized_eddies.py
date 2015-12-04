@@ -10,43 +10,42 @@ import netCDF4 as netCDF
 import pdb
 import matplotlib.pyplot as plt
 import tracpy
-import init
 from datetime import datetime, timedelta
 from glob import glob
 from tracpy.tracpy_class import Tracpy
 
 
-def init(name, ndays, grid_filename, currents_filename):
+def init(name, grid_filename, currents_filename):
     '''
     Initialize parameters for idealized eddy simulations. 
     Initialization for seeding drifters at all shelf model 
     grid points to be run forward.
     '''
 
-    time_units = 'seconds since 0001-01-01'
+    time_units = 'seconds since 0001-01-01  00:00:00'
 
     # horizontal_diffusivity project showed that relative dispersion did not
     # change between nsteps=25 and 50, but does between nsteps=5 and 25, and
     # interim numbers have not been tested yet.
-    nsteps = 19 # to approximate the output timing of the TXLA model 25 
+    nsteps = 19  # to approximate the output timing of the TXLA model 25 
 
     # Number of steps to divide model output for outputting drifter location
-    N = 4 # to approximate the output timing of the TXLA model # 5
+    N = 4  # to approximate the output timing of the TXLA model # 5
 
     # Number of days
-    # ndays = 30
+    ndays = 14
 
     # This is a forward-moving simulation
-    ff = 1 
+    ff = 1
 
     # Time between outputs
-    tseas = 10800.0 # time between output in seconds
+    tseas = 10800.0  # time between output in seconds
     ah = 0.
-    av = 0. # m^2/s
+    av = 0.  # m^2/s
 
     # surface drifters
-    z0 = 's'  
-    zpar = 29 # 30 layers
+    z0 = 's'
+    zpar = 29  # 30 layers
 
     # for 3d flag, do3d=0 makes the run 2d and do3d=1 makes the run 3d
     do3d = 0
@@ -61,7 +60,7 @@ def init(name, ndays, grid_filename, currents_filename):
     # Initialize Tracpy class
     tp = Tracpy(currents_filename, grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps,
                 N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, time_units=time_units,
-                usespherical=False, savell=False, doperiodic=1)
+                usespherical=False, savell=False, doperiodic=doperiodic)
 
     # force grid reading
     tp._readgrid()
@@ -83,57 +82,52 @@ def run():
 
     # Loop through all the simulations
     basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations/'
-    runs = glob(basepath + 'shelfstrat*')
+    # runs = ['shelfstrat_M2_1.49e-07_N2_1.00e-04_f_3.33e-05', 'shelfstrat_M2_1.92e-07_N2_1.00e-04_f_3.33e-05',
+    #         'shelfstrat_M2_2.24e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_2.36e-07_N2_1.00e-04_f_3.33e-05',
+    #         'shelfstrat_M2_2.89e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_3.33e-07_N2_1.00e-04_f_3.33e-05',
+    #         'shelfstrat_M2_3.54e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_4.47e-07_N2_1.00e-04_f_1.00e-04',
+    #         'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04',
+    #         'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 
-    for run in runs:
+    # # for just the first column, T=30
+    # runs = ['shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05','shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 
-        runname = run.split('/')[-1]
+    # for later start times, T=40
+    runs = ['shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 
-        # make directory for output
-        if not os.path.exists('tracks/' + runname):
-            os.makedirs('tracks/' + runname)
+    # list of start day for each simulation, in order. Calculated in Evernote.
+    # startday = [7, 5, 4, 4, 3, 3, 2, 1, 2, 1, 1, 1]  # For T=3
+    # startday = [10, 7, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1]  # For T=4
+    # startday = [23, 16, 11, 12, 8, 8, 6, 4, 4, 3, 2, 2]  # For T=10
+    # startday = [46, 32, 21, 24, 15, 16, 12, 7, 8, 5, 4, 3]  # For T=20
+    # startday = [12, 4]  # T=30
+    # startday = [5]  # T=40 (almost)
+    # startday = [6]  # T=40
+    startday = [7]  # T=40+
 
-        # pdb.set_trace()
+    for i, run in enumerate(runs):
+        print run
+
+        runname = run
 
         # Make symbolic links for run files from simulation in the main directory
-        hisfileloc = run + '/shelfstrat_his.nc'
-        grdfileloc = run + '/shelfstrat_grd.nc'
-        # hisfiledes = 'ocean_his_0001.nc' # 'tracks/' + runname + '/ocean_his_0001.nc'
-        # grdfiledes = 'grid.nc' # 'tracks/' + runname + '/grid.nc'
-        # hiscmd = 'ln -sf ' + hisfileloc + ' ' + hisfiledes
-        # grdcmd = 'ln -sf ' + grdfileloc + ' ' + grdfiledes
-        # pdb.set_trace()
-        # os.system(hiscmd)
-        # os.system(grdcmd)
+        hisfileloc = basepath + run + '/shelfstrat_his.nc'
+        grdfileloc = basepath + run + '/shelfstrat_grd.nc'
 
         # just do one simulation now
         f = netCDF.Dataset(hisfileloc)
-        t = f.variables['ocean_time'][:]
-        days = t[-1]/86400. # total number of days for simulation
-        daysdate = datetime(0001, 1, 1, 0, 0) + timedelta(days=int(days)) # end date of ocean simulation
-        date = daysdate - timedelta(days=7) # date to start drifter simulation
-
-        # # Start drifters daily in the simulations
-        # overallstartdate = datetime(0001, 1, 1, 0, 0)
-        # overallstopdate = datetime(0001, 1, 31, 0, 0)
-
-        # date = overallstartdate
-
-        # # Start from the beginning and add days on for loop
-        # # keep running until we hit the next month
-        # while date < overallstopdate:
-
-        name = date.isoformat()[0:13]
+        # t = f.variables['ocean_time']
+        startdate = datetime(0001, 1, 1, 0, 0) + timedelta(days=startday[i])
+        name = runname + '-startday' + str(startday[i])
 
         # If the particle trajectories have not been run, run them
-        if not os.path.exists('tracks/' + runname + '/' + name + '.nc') and \
-            not os.path.exists('tracks/' + runname + '/' + name + 'gc.nc'):
+        if not os.path.exists('tracks/' + name + '.nc') and \
+           not os.path.exists('tracks/' + name + 'gc.nc'):
 
             # Read in simulation initialization
-            ndays = 7 #(overallstopdate-date).days
-            tp, x0, y0 = init(runname + '/' + name, ndays, grdfileloc, hisfileloc)
+            tp, x0, y0 = init(name, grdfileloc, hisfileloc)
 
-            xp, yp, zp, t, T0, U, V = tracpy.run.run(tp, date, x0, y0)
+            xp, yp, zp, t, T0, U, V = tracpy.run.run(tp, startdate, x0, y0)
 
         # # Increment by 24 hours for next loop, to move through more quickly
         # date = date + timedelta(hours=24)
@@ -142,3 +136,4 @@ def run():
 
 if __name__ == "__main__":
     run()    
+

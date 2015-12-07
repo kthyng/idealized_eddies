@@ -30,7 +30,7 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations/'
 
-T = 40
+T = 2
 
 if T == 30:
     runs = ['shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05','shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
@@ -38,6 +38,11 @@ elif T == 40:
     # just the base case
     runs = ['shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04','shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04',
             'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04','shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04',
+            'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
+elif T == 2:
+    # T update. For T=2.
+    runs = ['shelfstrat_M2_4.47e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05',
+            'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04',
             'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 else:
     runs = ['shelfstrat_M2_1.49e-07_N2_1.00e-04_f_3.33e-05', 'shelfstrat_M2_1.92e-07_N2_1.00e-04_f_3.33e-05',
@@ -60,6 +65,8 @@ elif T == 30:
     startday = [12, 4]
 elif T == 40:
     startday = [3, 4, 5, 6, 7]  # only base case, more starting days
+elif T == 2:
+    startday = [16, 20, 12, 10, 7]
 
 grdfileloc = basepath + runs[0] + '/shelfstrat_grd.nc'
 # grid = tracpy.inout.readgrid(grdfileloc, usespherical=False)
@@ -168,7 +175,7 @@ for i, run in enumerate(runs):
 
 # ax.set_xlabel('Days 20 to 30')
 ax.set_ylabel('Mean squared separation distance [km$^2\!$]')
-ax.set_xlim(0, 14)
+ax.set_xlim(0, 10)
 
 ax.text(0.05, 0.95, 'Row 1', color='r', transform=ax.transAxes)
 ax.text(0.05, 0.92, 'Row 2', color='orange', transform=ax.transAxes)

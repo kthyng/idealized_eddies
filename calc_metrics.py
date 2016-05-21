@@ -30,7 +30,8 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 basepath = '/merrimack/raid/rob/Projects/shelfstrat/simulations/'
 
-T = 2
+T = 'other'
+dofig = False
 
 if T == 30:
     runs = ['shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05','shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
@@ -44,6 +45,10 @@ elif T == 2:
     runs = ['shelfstrat_M2_4.47e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05',
             'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04',
             'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
+elif T == 'other':
+    startday = np.arange(1, 24)
+    runname = 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04'
+    runs = [runname for i in range(len(startday))]
 else:
     runs = ['shelfstrat_M2_1.49e-07_N2_1.00e-04_f_3.33e-05', 'shelfstrat_M2_1.92e-07_N2_1.00e-04_f_3.33e-05',
             'shelfstrat_M2_2.24e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_2.36e-07_N2_1.00e-04_f_3.33e-05',
@@ -52,36 +57,37 @@ else:
             'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04',
             'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 
-# list of start day for each simulation, in order. Calculated in Evernote.
-if T == 3:
-    startday = [7, 5, 4, 4, 3, 3, 2, 1, 2, 1, 1, 1]  # For T=3
-elif T == 4:
-    startday = [10, 7, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1]  # For T=4
-elif T == 10:
-    startday = [23, 16, 11, 12, 8, 8, 6, 4, 4, 3, 2, 2]  # For T=10
-elif T == 20:
-    startday = [46, 32, 21, 24, 15, 16, 12, 7, 8, 5, 4, 3]  # For T=20
-elif T == 30:
-    startday = [12, 4]
-elif T == 40:
-    startday = [3, 4, 5, 6, 7]  # only base case, more starting days
-elif T == 2:
-    startday = [16, 20, 12, 10, 7]
+if not T == 'other':
+    # list of start day for each simulation, in order. Calculated in Evernote.
+    if T == 3:
+        startday = [7, 5, 4, 4, 3, 3, 2, 1, 2, 1, 1, 1]  # For T=3
+    elif T == 4:
+        startday = [10, 7, 5, 5, 3, 3, 3, 2, 2, 1, 1, 1]  # For T=4
+    elif T == 10:
+        startday = [23, 16, 11, 12, 8, 8, 6, 4, 4, 3, 2, 2]  # For T=10
+    elif T == 20:
+        startday = [46, 32, 21, 24, 15, 16, 12, 7, 8, 5, 4, 3]  # For T=20
+    elif T == 30:
+        startday = [12, 4]
+    elif T == 40:
+        startday = [3, 4, 5, 6, 7]  # only base case, more starting days
+    elif T == 2:
+        startday = [16, 20, 12, 10, 7]
 
 grdfileloc = basepath + runs[0] + '/shelfstrat_grd.nc'
 # grid = tracpy.inout.readgrid(grdfileloc, usespherical=False)
 
 # Set up figure
-fig = plt.figure(figsize=(10,10))
-ax = fig.add_subplot(111)
+if dofig:
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.add_subplot(111)
 
 for i, run in enumerate(runs):
 
-    fname = 'calcs/D2/' + run + '-startday' + str(startday[i]) + '.npz'
+    fname = 'calcs/D2/' + run + '-startday' + str(startday[i]).zfill(2) + '.npz'
     print fname
 
     if os.path.exists(fname):
-
         d = np.load(fname)
         D2 = d['D2']; days = d['days']; nnans = d['nnans']
         d.close()
@@ -145,26 +151,27 @@ for i, run in enumerate(runs):
         # Save
         np.savez(fname, D2=D2, nnans=nnans, pairs=pairs, days=days)
 
-    # plot
-    if '3.33e-05' in run: # row 3
-        color = 'g' # '0.4'
-    elif '5.00e-05' in run: # row 2
-        color = 'darkorange' # '0.1'
-    elif '1.00e-04' in run: # row 1
-        color = 'r'
-    # print run
-    # dalpha = (1-.25)/4.
-    # alpha = 0.25+dalpha*np.mod(i,5)
-    linestyles = ['-', '--', '-.', ':']#, 'o:']
-    if ('M2_3.33e-07' in run) or ('M2_5.00e-07' in run) or ('M2_1.00e-06' in run):
-        linestyle = linestyles[0]
-    elif ('M2_2.36e-07' in run) or ('M2_3.54e-07' in run) or ('M2_7.07e-07' in run):
-        linestyle = linestyles[1]
-    elif ('M2_1.92e-07' in run) or ('M2_2.89e-07' in run) or ('M2_5.77e-07' in run):
-        linestyle = linestyles[2]
-    elif ('M2_1.49e-07' in run) or ('M2_2.24e-07' in run) or ('M2_4.47e-07' in run):
-        linestyle = linestyles[3]
-    ax.semilogy(days, D2, linestyle, color=color, lw=4, mec=None, alpha=0.6)
+        if dofig:
+            # plot
+            if '3.33e-05' in run: # row 3
+                color = 'g' # '0.4'
+            elif '5.00e-05' in run: # row 2
+                color = 'darkorange' # '0.1'
+            elif '1.00e-04' in run: # row 1
+                color = 'r'
+            # print run
+            # dalpha = (1-.25)/4.
+            # alpha = 0.25+dalpha*np.mod(i,5)
+            linestyles = ['-', '--', '-.', ':']#, 'o:']
+            if ('M2_3.33e-07' in run) or ('M2_5.00e-07' in run) or ('M2_1.00e-06' in run):
+                linestyle = linestyles[0]
+            elif ('M2_2.36e-07' in run) or ('M2_3.54e-07' in run) or ('M2_7.07e-07' in run):
+                linestyle = linestyles[1]
+            elif ('M2_1.92e-07' in run) or ('M2_2.89e-07' in run) or ('M2_5.77e-07' in run):
+                linestyle = linestyles[2]
+            elif ('M2_1.49e-07' in run) or ('M2_2.24e-07' in run) or ('M2_4.47e-07' in run):
+                linestyle = linestyles[3]
+            ax.semilogy(days, D2, linestyle, color=color, lw=4, mec=None, alpha=0.6)
 
     # for ipair in pairs:
     #     dist = np.sqrt((xg[ipair[0],:] - xg[ipair[1],:])**2 + (yg[ipair[0],:] - yg[ipair[1],:])**2)
@@ -173,30 +180,31 @@ for i, run in enumerate(runs):
     #     if np.sum(dist>200)>1:
     #         print ipair
 
-# ax.set_xlabel('Days 20 to 30')
-ax.set_ylabel('Mean squared separation distance [km$^2\!$]')
-ax.set_xlim(0, 10)
+if dofig:
+    # ax.set_xlabel('Days 20 to 30')
+    ax.set_ylabel('Mean squared separation distance [km$^2\!$]')
+    ax.set_xlim(0, 10)
 
-ax.text(0.05, 0.95, 'Row 1', color='r', transform=ax.transAxes)
-ax.text(0.05, 0.92, 'Row 2', color='orange', transform=ax.transAxes)
-ax.text(0.05, 0.89, 'Row 3', color='g', transform=ax.transAxes)
+    ax.text(0.05, 0.95, 'Row 1', color='r', transform=ax.transAxes)
+    ax.text(0.05, 0.92, 'Row 2', color='orange', transform=ax.transAxes)
+    ax.text(0.05, 0.89, 'Row 3', color='g', transform=ax.transAxes)
 
-fig.savefig('figures/D2-T' + str(T) + '.png', bbox_inches='tight')
-fig.savefig('figures/D2-T' + str(T) + '.pdf', bbox_inches='tight')
+    fig.savefig('figures/D2-T' + str(T) + '.png', bbox_inches='tight')
+    fig.savefig('figures/D2-T' + str(T) + '.pdf', bbox_inches='tight')
 
-# add on TXLA shelf eddy region comparison
-shelfloc = '/rho/raid/home/kthyng/projects/shelf_transport/'
-fnameS = shelfloc + 'calcs/dispersion/hist/D2/r1/D2aveS.npz'
-D2aveS = np.load(fnameS)['D2aveS']
-dtracks = netCDF.Dataset(shelfloc + 'tracks/2004-01-01T00gc.nc')
-tp = dtracks.variables['tp']
-days2 = (tp-tp[0])/(3600.*24)
-dtracks.close()
-i25 = find(days2<=25)[-1]
-plt.semilogy(days2[:i25], D2aveS[70,45,:i25], '-', color='0.3', lw=4) # summer
+    # add on TXLA shelf eddy region comparison
+    shelfloc = '/rho/raid/home/kthyng/projects/shelf_transport/'
+    fnameS = shelfloc + 'calcs/dispersion/hist/D2/r1/D2aveS.npz'
+    D2aveS = np.load(fnameS)['D2aveS']
+    dtracks = netCDF.Dataset(shelfloc + 'tracks/2004-01-01T00gc.nc')
+    tp = dtracks.variables['tp']
+    days2 = (tp-tp[0])/(3600.*24)
+    dtracks.close()
+    i25 = find(days2<=25)[-1]
+    plt.semilogy(days2[:i25], D2aveS[70,45,:i25], '-', color='0.3', lw=4) # summer
 
-fig.savefig('figures/D2-withTXLA-T' + str(T) + '.png', bbox_inches='tight')
-fig.savefig('figures/D2-withTXLA-T' + str(T) + '.pdf', bbox_inches='tight')
+    fig.savefig('figures/D2-withTXLA-T' + str(T) + '.png', bbox_inches='tight')
+    fig.savefig('figures/D2-withTXLA-T' + str(T) + '.pdf', bbox_inches='tight')
 
 # if __name__ == "__main__":
 #     run()    

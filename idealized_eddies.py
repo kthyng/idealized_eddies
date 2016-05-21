@@ -33,7 +33,7 @@ def init(name, grid_filename, currents_filename):
     N = 4  # to approximate the output timing of the TXLA model # 5
 
     # Number of days
-    ndays = 10
+    ndays = 7
 
     # This is a forward-moving simulation
     ff = 1
@@ -89,10 +89,13 @@ def run():
     #         'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05', 'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04',
     #         'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 
-    # T update. For T=2.
-    runs = ['shelfstrat_M2_4.47e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05',
-            'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04',
-            'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
+    startday = np.arange(8, 30)
+    runname = 'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04'
+    runs = [runname for i in range(len(startday))]
+    # # T update. For T=2.
+    # runs = ['shelfstrat_M2_4.47e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_5.00e-07_N2_1.00e-04_f_5.00e-05',
+    #         'shelfstrat_M2_5.77e-07_N2_1.00e-04_f_1.00e-04', 'shelfstrat_M2_7.07e-07_N2_1.00e-04_f_1.00e-04',
+    #         'shelfstrat_M2_1.00e-06_N2_1.00e-04_f_1.00e-04']
 
     # list of start day for each simulation, in order. Calculated in Evernote.
     # startday = [7, 5, 4, 4, 3, 3, 2, 1, 2, 1, 1, 1]  # For T=3
@@ -100,9 +103,9 @@ def run():
     # startday = [23, 16, 11, 12, 8, 8, 6, 4, 4, 3, 2, 2]  # For T=10
     # startday = [46, 32, 21, 24, 15, 16, 12, 7, 8, 5, 4, 3]  # For T=20
     # startday = [12, 4]  # T=30
-    
-    # For updated T=2:
-    startday = [16, 20, 12, 10, 7]
+
+    # # For updated T=2:
+    # startday = [16, 20, 12, 10, 7]
 
     for i, run in enumerate(runs):
         print run
@@ -114,7 +117,7 @@ def run():
         grdfileloc = basepath + run + '/shelfstrat_grd.nc'
 
         # just do one simulation now
-        f = netCDF.Dataset(hisfileloc)
+        # f = netCDF.Dataset(hisfileloc)
         # t = f.variables['ocean_time']
         startdate = datetime(0001, 1, 1, 0, 0) + timedelta(days=startday[i])
         name = runname + '-startday' + str(startday[i])
